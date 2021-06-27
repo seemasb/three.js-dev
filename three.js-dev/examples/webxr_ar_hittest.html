@@ -9,13 +9,17 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - hit test<br/>(Chrome Android 81+)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> 00Maher ar - hit test<br/>(Chrome Android 81+)
 		</div>
 
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 			import { ARButton } from './jsm/webxr/ARButton.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
 
 			let container;
 			let camera, scene, renderer;
@@ -62,11 +66,36 @@
 
 					if ( reticle.visible ) {
 
-						const material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
-						const mesh = new THREE.Mesh( geometry, material );
-						mesh.position.setFromMatrixPosition( reticle.matrix );
-						mesh.scale.y = Math.random() * 2 + 1;
-						scene.add( mesh );
+						// const material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
+						// const mesh = new THREE.Mesh( geometry, material );
+						// mesh.position.setFromMatrixPosition( reticle.matrix );
+						// mesh.scale.y = Math.random() * 2 + 1;
+
+
+						const roughnessMipmapper = new RoughnessMipmapper( renderer );
+						// C:/Users\Msys\Downloads\three.js-dev\three.js-dev\examples\models\gltf\DamagedHelmet\glTF\mesh.gltf
+						const loader = new GLTFLoader().setPath( './models/gltf/DamagedHelmet/glTF/mesh.gltf' );
+						loader.load( 'mesh.gltf', function ( gltf ) {
+
+							gltf.scene.traverse( function ( child ) {
+
+								if ( child.isMesh ) {
+
+									roughnessMipmapper.generateMipmaps( child.material );
+
+								}
+
+							} );
+
+							scene.add( gltf.scene );
+
+							 roughnessMipmapper.dispose();
+
+							 render();
+
+						} );
+						
+					//	scene.add( mesh );
 
 					}
 
